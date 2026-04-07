@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+sentence-transformers
+scikit-learn
+numpy
+python-multipart
+gspread
+google-auth
+jinja2
+httpx
+python-dotenv

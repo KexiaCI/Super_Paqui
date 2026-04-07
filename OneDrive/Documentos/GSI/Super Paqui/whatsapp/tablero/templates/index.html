@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tablero - Paquetería San Diego</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #3b2b8e;
+            /* Púrpura San Diego */
+            --accent: #f39c12;
+            /* Naranja San Diego */
+            --primary-dark: #2c1e6e;
+            --bg: #f4f7fe;
+            --header: #3b2b8e;
+            --text-dark: #1b1b1b;
+            --text-muted: #64748b;
+            --white: #ffffff;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f1c40f;
+            --danger: #e74c3c;
+            --transit: #3498db;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header Navigation */
+        header.top-nav {
+            background-color: var(--header);
+            color: var(--white);
+            padding: 1rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .brand-logo {
+            background: var(--white);
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .brand-text-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-name {
+            font-weight: 800;
+            font-size: 1.4rem;
+            line-height: 1;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-tagline {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            padding: 0.5rem 0;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 2.5rem 3rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .page-title h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        /* Table Section */
+        .card {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 16px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .input-group label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        input,
+        select {
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.3s;
+            background: var(--white);
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(59, 43, 142, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 1.25rem 1rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            border-bottom: 2px solid #f1f5f9;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .status-badge {
+            padding: 0.4rem 0.85rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .status-solicitado {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-recogido {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-transito {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-mexico {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+
+        .status-entregado {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        select.status-select {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.8rem;
+            border-radius: 10px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            width: 130px;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            border-radius: 24px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .btn-refresh {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.85rem 1.75rem;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(243, 156, 18, 0.2);
+        }
+
+        .btn-refresh:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(243, 156, 18, 0.3);
+        }
+
+        /* Chart Grid Styles */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .chart-container {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border);
+            min-height: 400px;
+        }
+
+        .chart-container h3 {
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-left: 4px solid var(--accent);
+            padding-left: 1rem;
+        }
+
+        .indicator-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .indicator-card {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(59, 43, 142, 0.2);
+        }
+
+        .indicator-card h4 {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .indicator-card .val {
+            font-size: 1.75rem;
+            font-weight: 800;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="top-nav">
+        <div class="brand">
+            <div class="brand-logo">📦</div>
+            <div class="brand-text-container">
+                <span class="brand-name">Paquetería San Diego</span>
+                <span class="brand-tagline">Tablero de Paquetes</span>
+            </div>
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li><a id="nav-inicio" onclick="switchView('inicio')" class="active">Inicio</a></li>
+                <li><a id="nav-reportes" onclick="switchView('reportes')">Reportes</a></li>
+            </ul>
+        </nav>
+        <div class="user-profile">
+            <button class="btn-refresh" onclick="fetchOrders()">🔄 Sincronizar</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Vista de Inicio (Tabla y Stats Básicos) -->
+        <div id="view-inicio">
+            <div class="page-header">
+                <div class="page-title">
+                    <h1>Tablero de Gestión</h1>
+                    <p style="color: var(--text-muted); font-size: 1rem;">Administración y seguimiento de pedidos.</p>
+                </div>
+                <div class="avatar">AD</div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Pedidos</h3>
+                    <div class="value" id="stat-total">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Pendientes</h3>
+                    <div class="value" id="stat-pending" style="color: var(--danger);">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>En Tránsito</h3>
+                    <div class="value" id="stat-transit" style="color: var(--transit);">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Entregados</h3>
+                    <div class="value" id="stat-delivered" style="color: var(--success);">0</div>
+                </div>
+            </div>
+
+            <div class="card" style="position: relative;">
+                <div id="loader" class="loading-overlay hidden">
+                    <div class="spinner"></div>
+                </div>
+
+                <div class="filters">
+                    <div class="input-group">
+                        <label>Buscar Pedido</label>
+                        <input type="text" id="search" placeholder="Nombre o Teléfono..." onkeyup="filterTable()">
+                    </div>
+                    <div class="input-group">
+                        <label>Fecha Desde</label>
+                        <input type="date" id="date-from" onchange="filterTable()">
+                    </div>
+                    <div class="input-group">
+                        <label>Fecha Hasta</label>
+                        <input type="date" id="date-to" onchange="filterTable()">
+                    </div>
+                    <div class="input-group" style="max-width: 200px;">
+                        <label>Estado</label>
+                        <select id="filter-status" onchange="filterTable()">
+                            <option value="">Todos los Estados</option>
+                            <option value="Solicitado">Solicitado</option>
+                            <option value="Recogido">Recogido</option>
+                            <option value="En Tránsito">En Tránsito</option>
+                            <option value="En México">En México</option>
+                            <option value="Entregado">Entregado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table id="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Cliente</th>
+                                <th>Origen</th>
+                                <th>Destino</th>
+                                <th>Contenido</th>
+                                <th>Medidas</th>
+                                <th>Estatus</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-body">
+                            <!-- Llenado dinámico -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista de Reportes (Vacia por ahora) -->
+        <div id="view-reportes" class="hidden">
+            <div class="page-header">
+                <div class="page-title">
+                    <h1>Reportes</h1>
+                    <p style="color: var(--text-muted); font-size: 1rem;">Sección en preparación.</p>
+                </div>
+            </div>
+
+            <div class="card"
+                style="min-height: 400px; display: flex; align-items: center; justify-content: center; text-align: center; background: #f8fafc;">
+                <div>
+                    <div style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.5;">📊</div>
+                    <h2 style="color: var(--primary); font-weight: 700; margin-bottom: 0.5rem;">Panel de Análisis</h2>
+                    <p style="color: var(--text-muted);">Esta sección se encuentra en preparación para mostrar métricas
+                        avanzadas próximamente.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let allOrders = [];
+        let charts = {};
+
+        function switchView(view) {
+            document.getElementById('view-inicio').classList.toggle('hidden', view !== 'inicio');
+            document.getElementById('view-reportes').classList.toggle('hidden', view !== 'reportes');
+
+            document.getElementById('nav-inicio').classList.toggle('active', view === 'inicio');
+            document.getElementById('nav-reportes').classList.toggle('active', view === 'reportes');
+
+            if (view === 'reportes') {
+                updateReports();
+            }
+        }
+
+        function parseCustomDate(dateStr) {
+            if (!dateStr) return null;
+            let d = new Date(dateStr);
+            if (!isNaN(d.getTime())) return d;
+            const parts = dateStr.split(/[\/\- ]/);
+            if (parts.length >= 3) {
+                let day, month, year;
+                if (parts[0].length === 4) { year = parseInt(parts[0]); month = parseInt(parts[1]) - 1; day = parseInt(parts[2]); }
+                else { day = parseInt(parts[0]); month = parseInt(parts[1]) - 1; year = parseInt(parts[2]); }
+                d = new Date(year, month, day);
+                if (!isNaN(d.getTime())) return d;
+            }
+            return null;
+        }
+
+        async function fetchOrders() {
+            const loader = document.getElementById('loader');
+            loader.classList.remove('hidden');
+            try {
+                const res = await fetch('/api/orders');
+                const data = await res.json();
+                allOrders = data.orders || [];
+                renderTable(allOrders);
+                updateStats(allOrders);
+                if (!document.getElementById('view-reportes').classList.contains('hidden')) {
+                    updateReports();
+                }
+            } catch (e) {
+                console.error("Error fetching orders:", e);
+                alert("Error cargando los pedidos.");
+            } finally {
+                loader.classList.add('hidden');
+            }
+        }
+
+        function updateStats(orders) {
+            document.getElementById('stat-total').innerText = orders.length;
+            document.getElementById('stat-pending').innerText = orders.filter(o => o.Estatus === 'Solicitado').length;
+            document.getElementById('stat-transit').innerText = orders.filter(o => o.Estatus === 'En Tránsito').length;
+            document.getElementById('stat-delivered').innerText = orders.filter(o => o.Estatus === 'Entregado').length;
+        }
+
+        function updateReports() {
+            if (!allOrders.length) return;
+
+            // 1. Indicadores
+            let totalCot = 0;
+            allOrders.forEach(o => {
+                const cleanVal = String(o.Cotización || '').replace(/[^0-9.]/g, '');
+                totalCot += parseFloat(cleanVal) || 0;
+            });
+            document.getElementById('ind-total-cot').innerText = '$' + totalCot.toLocaleString('es-MX', { minimumFractionDigits: 2 });
+
+            const inProgress = allOrders.filter(o => ['Recogido', 'En Tránsito', 'En México'].includes(o.Estatus)).length;
+            document.getElementById('ind-in-progress').innerText = inProgress;
+
+            const delivered = allOrders.filter(o => o.Estatus === 'Entregado').length;
+            const efficiency = allOrders.length ? Math.round((delivered / allOrders.length) * 100) : 0;
+            document.getElementById('ind-efficiency').innerText = efficiency + '%';
+
+            // 2. Gráficas
+            renderOrigenChart();
+            renderDestinoChart();
+            renderMedidasChart();
+            renderFragilChart();
+            renderMensualChart();
+        }
+
+        function initChart(id, config) {
+            if (charts[id]) charts[id].destroy();
+            const ctx = document.getElementById(id).getContext('2d');
+            charts[id] = new Chart(ctx, config);
+        }
+
+        function renderOrigenChart() {
+            const freq = {};
+            allOrders.forEach(o => { if (o.Origen) freq[o.Origen] = (freq[o.Origen] || 0) + 1; });
+            const labels = Object.keys(freq);
+            const data = Object.values(freq);
+
+            initChart('chart-origen', {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Frecuencia',
+                        data: data,
+                        backgroundColor: 'rgba(59, 43, 142, 0.7)',
+                        borderColor: 'var(--primary)',
+                        borderWidth: 1,
+                        borderRadius: 8
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function renderDestinoChart() {
+            const categories = { 'San Diego': 0, 'Dolores': 0, 'San Luis de la Paz': 0, 'Querétaro': 0, 'Otros': 0 };
+            allOrders.forEach(o => {
+                const dest = String(o.Destino || '');
+                if (dest.includes('San Diego')) categories['San Diego']++;
+                else if (dest.includes('Dolores')) categories['Dolores']++;
+                else if (dest.includes('San Luis de la Paz')) categories['San Luis de la Paz']++;
+                else if (dest.includes('Querétaro')) categories['Querétaro']++;
+                else categories['Otros']++;
+            });
+
+            initChart('chart-destino', {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(categories),
+                    datasets: [{
+                        label: 'Pedidos',
+                        data: Object.values(categories),
+                        backgroundColor: 'rgba(243, 156, 18, 0.7)',
+                        borderColor: 'var(--accent)',
+                        borderWidth: 1,
+                        borderRadius: 8
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y' }
+            });
+        }
+
+        function renderMedidasChart() {
+            const freq = {};
+            allOrders.forEach(o => { if (o.Medidas) freq[o.Medidas] = (freq[o.Medidas] || 0) + 1; });
+            const labels = Object.keys(freq).slice(0, 5); // Top 5
+            const data = Object.values(freq).slice(0, 5);
+
+            initChart('chart-medidas', {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: ['#3b2b8e', '#f39c12', '#10b981', '#3498db', '#94a3b8']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function renderFragilChart() {
+            const count = { 'Frágil': 0, 'Normal': 0 };
+            allOrders.forEach(o => {
+                const f = String(o.Fragil || '').toLowerCase();
+                if (f === 'sí' || f === 'si' || f === 'true') count['Frágil']++;
+                else count['Normal']++;
+            });
+
+            initChart('chart-fragil', {
+                type: 'bar',
+                data: {
+                    labels: ['Frágil', 'Normal'],
+                    datasets: [{
+                        label: 'Total',
+                        data: [count['Frágil'], count['Normal']],
+                        backgroundColor: ['#e74c3c', '#10b981']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function renderMensualChart() {
+            const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+            const freq = new Array(12).fill(0);
+
+            allOrders.forEach(o => {
+                const d = parseCustomDate(o['Fecha Registro']);
+                if (d) {
+                    freq[d.getMonth()]++;
+                }
+            });
+
+            initChart('chart-mensual', {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Envíos por Mes',
+                        data: freq,
+                        borderColor: 'var(--primary)',
+                        backgroundColor: 'rgba(59, 43, 142, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: 'var(--accent)'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function renderTable(orders) {
+            const body = document.getElementById('orders-body');
+            body.innerHTML = '';
+            orders.forEach(order => {
+                const tr = document.createElement('tr');
+                const d = parseCustomDate(order['Fecha Registro']);
+                let displayDate = order['Fecha Registro'] || '';
+                if (d) displayDate = d.toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
+                const measures = order['Medidas'] || '';
+                const phone = order['Teléfono'] || '';
+                const name = order['Nombre'] || '';
+                tr.innerHTML = `
+                    <td style="font-weight: 600; font-size: 0.8rem; color: var(--primary);">${displayDate}</td>
+                    <td><div style="font-weight: 700;">${name}</div><div style="font-size: 0.75rem; color: var(--text-muted);">${phone}</div></td>
+                    <td>${order.Origen || ''}</td>
+                    <td>${order.Destino || ''}</td>
+                    <td title="${order.Contenido || ''}">${truncate(order.Contenido || '', 20)}</td>
+                    <td><span style="background: rgba(243, 156, 18, 0.1); color: var(--accent); padding: 5px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(243, 156, 18, 0.2);">${measures}</span></td>
+                    <td>
+                        <select class="status-select ${getStatusClass(order.Estatus)}" onchange="updateStatus(${order.row_index}, this.value)">
+                            <option value="Solicitado" ${order.Estatus === 'Solicitado' ? 'selected' : ''}>Solicitado</option>
+                            <option value="Recogido" ${order.Estatus === 'Recogido' ? 'selected' : ''}>Recogido</option>
+                            <option value="En Tránsito" ${order.Estatus === 'En Tránsito' ? 'selected' : ''}>En Tránsito</option>
+                            <option value="En México" ${order.Estatus === 'En México' ? 'selected' : ''}>En México</option>
+                            <option value="Entregado" ${order.Estatus === 'Entregado' ? 'selected' : ''}>Entregado</option>
+                        </select>
+                    </td>
+                `;
+                body.appendChild(tr);
+            });
+        }
+
+        function getStatusClass(status) {
+            switch (status) {
+                case 'Solicitado': return 'status-solicitado';
+                case 'Recogido': return 'status-recogido';
+                case 'En Tránsito': return 'status-transito';
+                case 'En México': return 'status-mexico';
+                case 'Entregado': return 'status-entregado';
+                default: return '';
+            }
+        }
+
+        async function updateStatus(rowIndex, newStatus) {
+            const selectEl = event.target;
+            try {
+                const res = await fetch('/api/orders/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ row_index: rowIndex, status: newStatus })
+                });
+                const result = await res.json();
+                if (res.ok && result.success) {
+                    const order = allOrders.find(o => o.row_index === rowIndex);
+                    if (order) order.Estatus = newStatus;
+                    updateStats(allOrders);
+                    selectEl.className = 'status-select ' + getStatusClass(newStatus);
+                    if (!document.getElementById('view-reportes').classList.contains('hidden')) updateReports();
+                } else {
+                    alert("Error en el servidor");
+                    const originalOrder = allOrders.find(o => o.row_index === rowIndex);
+                    if (originalOrder) selectEl.value = originalOrder.Estatus;
+                }
+            } catch (e) {
+                alert("Error de conexión.");
+            }
+        }
+
+        function filterTable() {
+            const query = document.getElementById('search').value.toLowerCase();
+            const from = document.getElementById('date-from').value;
+            const to = document.getElementById('date-to').value;
+            const status = document.getElementById('filter-status').value;
+            const filtered = allOrders.filter(order => {
+                const matchName = (order.Nombre || '').toLowerCase().includes(query);
+                const matchPhone = (order['Teléfono'] || '').includes(query);
+                const d = parseCustomDate(order['Fecha Registro']);
+                const orderDate = d ? d.toISOString().split('T')[0] : '';
+                const matchFrom = !from || orderDate >= from;
+                const matchTo = !to || orderDate <= to;
+                const matchStatus = !status || order.Estatus === status;
+                return (matchName || matchPhone) && matchFrom && matchTo && matchStatus;
+            });
+            renderTable(filtered);
+        }
+
+        function truncate(str, n) { return (str.length > n) ? str.substr(0, n - 1) + '&hellip;' : str; }
+        window.onload = fetchOrders;
+    </script>
+</body>
+
+</html>
