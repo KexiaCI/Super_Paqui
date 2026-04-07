@@ -1,8 +1,0 @@
-fastapi
-uvicorn
-httpx
-gspread
-google-auth
-sentence-transformers
-scikit-learn
-numpy
